@@ -1,13 +1,14 @@
 /* taken from the original implementation of debug:
    this hackery is required for IE8/9, where
    the `console.log` function doesn't have 'apply' */
-let log = [%bs.raw {|
-  function (args) {
+[%%bs.raw {|
+  function log(args) {
     return 'object' === typeof console
       && console.log
       && Function.prototype.apply.call(console.log, console, args);
   }
 |}];
+external log : array 'a => unit = "" [@@bs.val];
 let log args =>
   log (Array.of_list args);
 
@@ -31,8 +32,8 @@ let format namespace diff payload =>
 let storageKey = "debug";
 
 let save =
-  fun | Some namespaces =>
-        Dom.Storage.(setItem storageKey namespaces localStorage)
+  fun | Some filter =>
+        Dom.Storage.(setItem storageKey filter localStorage)
       | None =>
         Dom.Storage.(removeItem storageKey localStorage);
 

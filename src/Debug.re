@@ -29,9 +29,11 @@ module Make(Env: Env) => {
     mutable enabled: bool
   };
 
+
   let instances = ref [];
   let names = ref [];
   let skips = ref [];
+
 
   /* a namespace ending in "*" will always be enabled */
   let _isForceEnabled namespace =>
@@ -50,11 +52,10 @@ module Make(Env: Env) => {
 
 
   let make namespace => {
-    let prevTime = ref (Js.Date.now ());
-
+    let timer = Utils.timer ();
     let instance = {
       namespace,
-      color: Utils.selectColor namespace Env.colors,
+      color: Utils.selectColor Env.colors namespace,
       enabled: isEnabled namespace
     };
 
@@ -62,11 +63,8 @@ module Make(Env: Env) => {
 
     let log message args => {
       if (instance.enabled) {
-        let curr = Js.Date.now ();
-        let diff = curr -. !prevTime;
-        prevTime := curr;
-
-        let formatted = Env.format namespace (Utils.Format.ms diff) message;
+        let delta = (Utils.Format.ms (timer ()));
+        let formatted = Env.format namespace delta message;
         let color = "color:" ^ instance.color;
         Env.log [arg formatted, arg color, arg "color: inherit", arg color, ...args];
       }
@@ -83,29 +81,31 @@ module Make(Env: Env) => {
     };
   };
 
+
   let _resetNamespaces () => {
     names := [];
     skips := [];
   };
 
-  let enable namespaces => {
-    Env.save (Some namespaces);
+  let _parseFilter filter =>
+    filter |> Js.String.splitByRe [%re "/[/s,]+/"]
+           |> Js.Array.filter (fun ns => ns !== "")
+           |> Js.Array.forEach (
+             fun namespace => {
+               let namespace = namespace |> Js.String.replaceByRe [%re "/\*/g"] ".*?";
+               if (Js.String.get namespace 0 === "-") {
+                 let namespace = namespace |> Js.String.substr from::1;
+                 skips := [Js.Re.fromString {j|^$namespace\$|j}, ...!skips];
+               } else {
+                 names := [Js.Re.fromString {j|^$namespace\$|j}, ...!names];
+               }
+             });
+
+  let enable filter => {
+    Env.save (Some filter);
 
     _resetNamespaces ();
-
-    namespaces |> Js.String.splitByRe [%re "/[/s,]+/"]
-               |> Js.Array.filter (fun ns => ns !== "")
-               |> Js.Array.forEach (
-                  fun namespace => {
-                    let namespace = namespace |> Js.String.replaceByRe [%re "/\*/g"] ".*?";
-                    if (Js.String.get namespace 0 === "-") {
-                      let namespace = namespace |> Js.String.substr from::1;
-                      skips := [Js.Re.fromString {j|^$namespace\$|j}, ...!skips];
-                    } else {
-                      names := [Js.Re.fromString {j|^$namespace\$|j}, ...!names];
-                    }
-                  });
-
+    _parseFilter filter;
     !instances |> List.iter (fun i => i.enabled = isEnabled(i.namespace))
   };
   
@@ -116,6 +116,7 @@ module Make(Env: Env) => {
     !instances |> List.iter (fun i => i.enabled = false)
   };
 
+  /* initalization */
   let () =
     switch (Env.load ()) {
     | Some  namespaces => enable namespaces
