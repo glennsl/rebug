@@ -1,0 +1,4 @@
+{
+  "name": "bs-rebug",
+  "sources": ["src", { "dir": "examples", "type": "dev" }]
+}

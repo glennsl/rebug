@@ -1,0 +1,6 @@
+/lib/*
+!/lib/js
+node_modules
+/build/
+.merlin
+npm-debug.log
