@@ -28,5 +28,13 @@ let colors = [|
 let format namespace diff payload =>
   {j|%c$namespace %c$payload%c +$diff|j};
 
-let save _ => ();
-let load () => "*";
+let storageKey = "debug";
+
+let save =
+  fun | Some namespaces =>
+        Dom.Storage.(setItem storageKey namespaces localStorage)
+      | None =>
+        Dom.Storage.(removeItem storageKey localStorage);
+
+let load () =>
+  Dom.Storage.(getItem storageKey localStorage);
