@@ -4,3 +4,4 @@ node_modules
 /build/
 .merlin
 npm-debug.log
+.bsb.lock
