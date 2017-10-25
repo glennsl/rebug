@@ -11,6 +11,8 @@ module type Env = {
 
 module Make(Env: Env) => {
 
+  type logger 'a = 'a => unit;
+
   type instance = {
     namespace: string,
     color: string,
