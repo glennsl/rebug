@@ -1,4 +1,16 @@
-let log = Js.log4;
+/* taken from the original implementation of debug:
+   this hackery is required for IE8/9, where
+   the `console.log` function doesn't have 'apply' */
+let log = [%bs.raw {|
+  function (args) {
+    return 'object' === typeof console
+      && console.log
+      && Function.prototype.apply.call(console.log, console, args);
+  }
+|}];
+let log args =>
+  log (Array.of_list args);
+
 let colors = [|
   "#0000CC", "#0000FF", "#0033CC", "#0033FF", "#0066CC", "#0066FF", "#0099CC",
   "#0099FF", "#00CC00", "#00CC33", "#00CC66", "#00CC99", "#00CCCC", "#00CCFF",
@@ -12,7 +24,9 @@ let colors = [|
   "#FF00FF", "#FF3300", "#FF3333", "#FF3366", "#FF3399", "#FF33CC", "#FF33FF",
   "#FF6600", "#FF6633", "#FF9900", "#FF9933", "#FFCC00", "#FFCC33"
 |];
+
 let format namespace diff payload =>
   {j|%c$namespace %c$payload%c +$diff|j};
+
 let save _ => ();
 let load () => "*";

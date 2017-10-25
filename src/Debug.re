@@ -2,7 +2,7 @@ module Utils = Debug__Utils;
 module Browser = Debug__Browser;
 
 module type Env = {
-  let log: 'a => string => string => string => unit;
+  let log: list 'a => unit;
   let format: string => string => 'a => string;
   let save: string => unit;
   let load: unit => string;
@@ -10,8 +10,18 @@ module type Env = {
 };
 
 module Make(Env: Env) => {
+  type arg;
+  external arg : 'a => arg = "%identity";
 
-  type logger 'a = 'a => unit;
+  type logger = {
+    log: string => unit,
+    log2: 'a. string => 'a => unit,
+    log3: 'a 'b. string => 'a => 'b => unit,
+    log4: 'a 'b 'c. string => 'a => 'b => 'c => unit,
+    logMany: string => list arg => unit,
+    isEnabled : unit => bool,
+    enable : unit => unit
+  };
 
   type instance = {
     namespace: string,
@@ -34,19 +44,29 @@ module Make(Env: Env) => {
 
     instances := [instance, ...!instances];
 
-    fun payload => {
+    let log message args => {
       let curr = Js.Date.now ();
       let diff = curr -. !prevTime;
       prevTime := curr;
 
-      let formatted = Env.format namespace (Utils.Format.ms diff) payload;
+      let formatted = Env.format namespace (Utils.Format.ms diff) message;
       let color = "color:" ^ instance.color;
-      Env.log formatted color "color: inherit" color;
+      Env.log [arg formatted, arg color, arg "color: inherit", arg color, ...args];
+    };
+
+    {
+      log: fun m => log m [],
+      log2: fun m a => log m [arg a],
+      log3: fun m a b => log m [arg a, arg b],
+      log4: fun m a b c => log m [arg a, arg b, arg c],
+      logMany: log,
+      isEnabled: fun () => instance.enabled,
+      enable: fun () => instance.enabled = true
     };
   };
 
-  /* Not quite sure what the logic is behind this... */
-  let _endsWithWildcard namespace =>
+  /* a namespace ending in "*" will always be enabled */
+  let _isForceEnabled namespace =>
     Js.String.get namespace (Js.String.length namespace) === "*";
 
   let _isSkipped namespace =>
@@ -55,8 +75,9 @@ module Make(Env: Env) => {
   let _isNamed namespace =>
     !names |> List.exists (fun re => re |> Js.Re.test namespace);
 
+  /* does not take into account manually enabled instances */
   let isEnabled namespace =>
-    _endsWithWildcard namespace ||
+    _isForceEnabled namespace ||
     (not (_isSkipped namespace) && _isNamed namespace);
 
   let enable namespaces => {
