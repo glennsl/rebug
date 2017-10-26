@@ -1,5 +1,11 @@
 {
-  "name": "bs-rebug",
+  "name": "rebug",
   "bsc-flags": ["-bs-no-version-header", "-bs-super-errors"],
-  "sources": ["src", { "dir": "examples", "type": "dev" }]
+  "sources": [{
+    "dir": "src", 
+    "subdirs": true
+  }, { 
+    "dir": "examples",
+    "type": "dev"
+  }]
 }
