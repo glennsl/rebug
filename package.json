@@ -1,5 +1,5 @@
 {
-  "name": "rebug",
+  "name": "bs-rebug",
   "version": "0.1.0",
   "scripts": {
     "clean": "bsb -clean-world",
