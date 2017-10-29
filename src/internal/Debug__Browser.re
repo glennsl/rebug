@@ -2,15 +2,18 @@
    this hackery is required for IE8/9, where
    the `console.log` function doesn't have 'apply' */
 [%%bs.raw {|
-  function log(args) {
-    return 'object' === typeof console
-      && console.log
-      && Function.prototype.apply.call(console.log, console, args);
-  }
+function log(args) {
+  return 'object' === typeof console
+    && console.log
+    && Function.prototype.apply.call(console.log, console, args);
+}
 |}];
-external log : array 'a => unit = "" [@@bs.val];
-let log args =>
-  log (Array.of_list args);
+ 
+[@bs.val] external log : array('a) => unit = "";
+ 
+let log = (args) =>
+  args |> Array.of_list
+       |> log;
 
 let colors = [|
   "#0000CC", "#0000FF", "#0033CC", "#0033FF", "#0066CC", "#0066FF", "#0099CC",
@@ -26,16 +29,16 @@ let colors = [|
   "#FF6600", "#FF6633", "#FF9900", "#FF9933", "#FFCC00", "#FFCC33"
 |];
 
-let format namespace diff payload =>
+let format = (namespace, diff, payload) =>
   {j|%c$namespace %c$payload%c +$diff|j};
 
 let storageKey = "debug";
 
 let save =
-  fun | Some filter =>
-        Dom.Storage.(setItem storageKey filter localStorage)
+  fun | Some(filter) =>
+        Dom.Storage.(localStorage |> setItem(storageKey, filter))
       | None =>
-        Dom.Storage.(removeItem storageKey localStorage);
+        Dom.Storage.(localStorage |> removeItem(storageKey));
 
-let load () =>
-  Dom.Storage.(getItem storageKey localStorage);
+let load = () =>
+  Dom.Storage.(localStorage |> getItem(storageKey));
