@@ -9,11 +9,25 @@ function log(args) {
 }
 |}];
  
+[%%bs.raw {|
+function error(args) {
+  return 'object' === typeof console
+    && console.error
+    && Function.prototype.apply.call(console.error, console, args);
+}
+|}];
+ 
 [@bs.val] external log : array('a) => unit = "";
  
 let log = (args) =>
   args |> Array.of_list
        |> log;
+
+[@bs.val] external error : array('a) => unit = "";
+ 
+let error = (args) =>
+  args |> Array.of_list
+       |> error;
 
 let colors = [|
   "#0000CC", "#0000FF", "#0033CC", "#0033FF", "#0066CC", "#0066FF", "#0099CC",
@@ -31,6 +45,9 @@ let colors = [|
 
 let format = (namespace, diff, payload) =>
   {j|%c$namespace %c$payload%c +$diff|j};
+
+[@bs.val] external group : string => unit = "console.group";
+[@bs.val] external groupEnd : unit => unit = "console.groupEnd";
 
 let storageKey = "debug";
 
