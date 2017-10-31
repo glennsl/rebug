@@ -35,3 +35,7 @@ let doThings =
   });
 
 doThings(record, 2);
+
+let loggedParse = a.fn1("JSON.parse", Js.Json.parseExn);
+
+Js.log(loggedParse({j|{ "foo": "bar" }|j}));

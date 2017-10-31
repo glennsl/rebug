@@ -1,7 +1,7 @@
 
 # rebug
 
-A port of [debug](https://github.com/visionmedia/debug) to BuckleScript.
+Originally a port of [debug](https://github.com/visionmedia/debug) to BuckleScript, but has since expanded a bit.
 
 ## Status
 
@@ -14,13 +14,22 @@ A port of [debug](https://github.com/visionmedia/debug) to BuckleScript.
 
 ```reason
 /* Reason */
-let debug = Debug.make "my:namespace";
 
-a.log "The red cow jumps over the lazy giraffe";
+/* creates a logger with the given namespace */
+let debug = Debug.make("my:namespace");
 
+/* debug.log* logs the message only if the namespace of the logger is enabled */
+debug.log1("The red cow jumps over the lazy giraffe");
+
+/* debug.error* will log the message regardless of whether the namespace is
+   enabled, format it as an error and include a stack trace */
 try (...) {
-| error => a.log2 "Error occurred while doing stuff: " error;
+| error => a.error2("Error occurred while doing stuff: ", error)
 };
+
+/* debug.fn* groups any log output during its execution, and logs the arguments
+   passed to and the value returned from the function */
+let loggedParse = debug.fn1("JSON.parse", Js.Json.parseExn);
 ```
 
 See [examples](https://github.com/glennsl/rebug/blob/master/examples/) for more.
