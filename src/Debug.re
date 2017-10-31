@@ -35,10 +35,10 @@ module Make = (Env: Env) => {
     lazy4: 'a 'b 'c. (unit => (string, 'a, 'b, 'c)) => unit,
     lazyMany: (unit => (string, list(arg))) => unit,
 
-    fn1: 'a 'r. (string, ('a => 'r), 'a) => 'r,
-    fn2: 'a 'b 'r. (string, (('a, 'b) => 'r), 'a, 'b) => 'r,
-    fn3: 'a 'b 'c 'r. (string, (('a, 'b, 'c) => 'r), 'a, 'b, 'c) => 'r,
-    fn4: 'a 'b 'c 'd 'r. (string, (('a, 'b, 'c, 'd) => 'r), 'a, 'b, 'c, 'd) => 'r,
+    fn1: 'a 'r. (string, ~pp1:'a => string=?, ~ppR:'r => string=?, ('a => 'r), 'a) => 'r,
+    fn2: 'a 'b 'r. (string, ~pp1:'a => string=?, ~pp2:'b => string=?, ~ppR:'r => string=?, (('a, 'b) => 'r), 'a, 'b) => 'r,
+    fn3: 'a 'b 'c 'r. (string, ~pp1:'a => string=?, ~pp2:'b => string=?, ~pp3:'c => string=?, ~ppR:'r => string=?, (('a, 'b, 'c) => 'r), 'a, 'b, 'c) => 'r,
+    fn4: 'a 'b 'c 'd 'r. (string, ~pp1:'a => string=?, ~pp2:'b => string=?, ~pp3:'c => string=?, ~pp4:'d => string=?, ~ppR:'r => string=?, (('a, 'b, 'c, 'd) => 'r), 'a, 'b, 'c, 'd) => 'r,
 
     isEnabled: unit => bool,
     enable: unit => unit
@@ -91,38 +91,36 @@ module Make = (Env: Env) => {
         log([arg(formatted), arg(color), arg("color: inherit"), arg(color), ...args])
       };
 
-      let logIfEnabled = (message, args) =>
-        instance.enabled ? log(Env.log, message, args) : ();
-
-      let error = (message, args) =>
-        log(Env.error, message, args);
-      
       let fnEnter = (message, args) => {
         Env.group(message);
-        logIfEnabled("->", args);
+        log(Env.log, "->", args);
       };
       let fnExit = (ret) => {
-        logIfEnabled("<-", [arg(ret)]);
+        log(Env.log, "<-", [arg(ret)]);
         Env.groupEnd();
-        ret
       };
+
+      let id: 'a => string = Obj.magic;
     };
     open! Helpers;
 
     {
-      log1: (m) => logIfEnabled(m, []),
-      log2: (m, a) => logIfEnabled(m, [arg(a)]),
-      log3: (m, a, b) => logIfEnabled(m, [arg(a), arg(b)]),
-      log4: (m, a, b, c) => logIfEnabled(m, [arg(a), arg(b), arg(c)]),
-      logMany: logIfEnabled,
+      log1: (m) => if (instance.enabled) { log(Env.log, m, []) },
+      log2: (m, a) => if (instance.enabled) { log(Env.log, m, [arg(a)]) },
+      log3: (m, a, b) => if (instance.enabled) { log(Env.log, m, [arg(a), arg(b)]) },
+      log4: (m, a, b, c) => if (instance.enabled) { log(Env.log, m, [arg(a), arg(b), arg(c)]) },
+      logMany: (m, args) => if (instance.enabled) { log(Env.log, m, args) },
 
-      error1: (m) => error(m, []),
-      error2: (m, a) => error(m, [arg(a)]),
-      error3: (m, a, b) => error(m, [arg(a), arg(b)]),
-      error4: (m, a, b, c) => error(m, [arg(a), arg(b), arg(c)]),
-      errorMany: error,
+      error1: (m) => log(Env.error, m, []),
+      error2: (m, a) => log(Env.error, m, [arg(a)]),
+      error3: (m, a, b) => log(Env.error, m, [arg(a), arg(b)]),
+      error4: (m, a, b, c) => log(Env.error, m, [arg(a), arg(b), arg(c)]),
+      errorMany: (m, args) => log(Env.error, m, args),
 
-      lazy1: (f) => instance.enabled ? log(Env.log, f(), []) : (),
+      lazy1: (f) =>
+        if (instance.enabled) {
+          log(Env.log, f(), [])
+        },
       lazy2: (f) =>
         if (instance.enabled) {
           let (m, a) = f();
@@ -144,26 +142,44 @@ module Make = (Env: Env) => {
           log(Env.log, m, args)
         },
 
-      fn1: (m, f) => (a) => {
-        fnEnter(m, [arg(a)]);
-        let ret = f(a);
-        fnExit(ret)
-      },
-      fn2: (m, f) => (a, b) => {
-        fnEnter(m, [arg(a), arg(b)]);
-        let ret = f(a, b);
-        fnExit(ret)
-      },
-      fn3: (m, f) => (a, b, c) => {
-        fnEnter(m, [arg(a), arg(b), arg(c)]);
-        let ret = f(a, b, c);
-        fnExit(ret)
-      },
-      fn4: (m, f) => (a, b, c, d) => {
-        fnEnter(m, [arg(a), arg(b), arg(c), arg(d)]);
-        let ret = f(a, b, c, d);
-        fnExit(ret)
-      },
+      fn1: (m, ~pp1=id, ~ppR=id, f) => (a) =>
+        if (instance.enabled) {
+          fnEnter(m, [arg(pp1(a))]);
+          let ret = f(a);
+          fnExit(ppR(ret));
+          ret
+        } else {
+          f(a)
+        },
+      fn2: (m, ~pp1=id, ~pp2=id, ~ppR=id, f) => (a, b) =>
+        if (instance.enabled) {
+          fnEnter(m, [arg(pp1(a)), arg(pp2(b))]);
+          let ret = f(a, b);
+          fnExit(ppR(ret));
+          ret
+        } else {
+          f(a, b)
+        },
+
+      fn3: (m, ~pp1=id, ~pp2=id, ~pp3=id, ~ppR=id, f) => (a, b, c) =>
+        if (instance.enabled) {
+          fnEnter(m, [arg(pp1(a)), arg(pp2(b)), arg(pp3(c))]);
+          let ret = f(a, b, c);
+          fnExit(ppR(ret));
+          ret
+        } else {
+          f(a, b, c)
+        },
+
+      fn4: (m, ~pp1=id, ~pp2=id, ~pp3=id, ~pp4=id, ~ppR=id, f) => (a, b, c, d) =>
+        if (instance.enabled) {
+          fnEnter(m, [arg(pp1(a)), arg(pp2(b)), arg(pp3(c)), arg(pp4(d))]);
+          let ret = f(a, b, c, d);
+          fnExit(ppR(ret));
+          ret
+        } else {
+          f(a, b, c, d)
+        },
 
       isEnabled: () => instance.enabled,
       enable: () => instance.enabled = true

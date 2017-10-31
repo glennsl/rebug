@@ -21,10 +21,10 @@ type logger = {
   lazy4: 'a 'b 'c. (unit => (string, 'a, 'b, 'c)) => unit,
   lazyMany: (unit => (string, list(arg))) => unit,
 
-  fn1: 'a 'r. (string, ('a => 'r), 'a) => 'r,
-  fn2: 'a 'b 'r. (string, (('a, 'b) => 'r), 'a, 'b) => 'r,
-  fn3: 'a 'b 'c 'r. (string, (('a, 'b, 'c) => 'r), 'a, 'b, 'c) => 'r,
-  fn4: 'a 'b 'c 'd 'r. (string, (('a, 'b, 'c, 'd) => 'r), 'a, 'b, 'c, 'd) => 'r,
+  fn1: 'a 'r. (string, ~pp1:'a => string=?, ~ppR:'r => string=?, ('a => 'r), 'a) => 'r,
+  fn2: 'a 'b 'r. (string, ~pp1:'a => string=?, ~pp2:'b => string=?, ~ppR:'r => string=?, (('a, 'b) => 'r), 'a, 'b) => 'r,
+  fn3: 'a 'b 'c 'r. (string, ~pp1:'a => string=?, ~pp2:'b => string=?, ~pp3:'c => string=?, ~ppR:'r => string=?, (('a, 'b, 'c) => 'r), 'a, 'b, 'c) => 'r,
+  fn4: 'a 'b 'c 'd 'r. (string, ~pp1:'a => string=?, ~pp2:'b => string=?, ~pp3:'c => string=?, ~pp4:'d => string=?, ~ppR:'r => string=?, (('a, 'b, 'c, 'd) => 'r), 'a, 'b, 'c, 'd) => 'r,
 
   isEnabled: unit => bool,
   enable: unit => unit /* Too imperative? Might be removed */

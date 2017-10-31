@@ -3,6 +3,11 @@ let b = Debug.make("debug:b");
 
 let obj = { "foo": 42, "bar": true };
 
+type record = { foo: int, bar: bool };
+let record = { foo: 24, bar: false };
+let ppRecord = ({ foo, bar }) =>
+  {j|{ foo: $foo, bar: $bar }|j};
+
 a.log1("The red cow jumps over the lazy giraffe");
 b.log2("wat", obj);
 
@@ -22,3 +27,11 @@ a.lazy2 (fun () => ("lazy", obj));
 
 
 b.error2("boo!", obj);
+
+let doThings =
+  b.fn2("doThings", ~pp1=ppRecord, (r, n) => {
+    b.log2("foo: ", r.foo);
+    powSquared(r.foo, n)
+  });
+
+doThings(record, 2);
