@@ -5,7 +5,7 @@ module type Env = {
   let log: list('a) => unit;
   let error: list('a) => unit;
   let format: (string, string, 'a) => string;
-  let group: string => unit;
+  let group: list('a) => unit;
   let groupEnd: unit => unit;
   let save: option(string) => unit;
   let load: unit => option(string);
@@ -92,8 +92,10 @@ module Make = (Env: Env) => {
       };
 
       let fnEnter = (message, args) => {
-        Env.group(message);
-        log(Env.log, "->", args);
+        let delta = Utils.Format.ms(timer());
+        let formatted = Env.format(namespace, delta, message);
+        let color = "color:" ++ instance.color;
+        Env.group([arg(formatted), arg(color), arg("color: inherit"), arg(color), ...args]);
       };
       let fnExit = (ret) => {
         log(Env.log, "<-", [arg(ret)]);

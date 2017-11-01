@@ -14,7 +14,7 @@
   "author": "glennsl",
   "license": "MIT",
   "devDependencies": {
-    "bs-platform": "^1.9.3"
+    "bs-platform": "^2.0.0"
   },
   "dependencies": {
     "webpack": "^3.8.1"

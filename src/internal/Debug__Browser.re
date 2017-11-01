@@ -46,7 +46,19 @@ let colors = [|
 let format = (namespace, diff, payload) =>
   {j|%c$namespace %c$payload%c +$diff|j};
 
-[@bs.val] external group : string => unit = "console.group";
+[%%bs.raw {|
+function group(args) {
+  return 'object' === typeof console
+    && console.group
+    && Function.prototype.apply.call(console.group, console, args);
+}
+|}];
+ 
+[@bs.val] external group : array('a) => unit = "";
+let group = (args) =>
+  args |> Array.of_list
+       |> group;
+
 [@bs.val] external groupEnd : unit => unit = "console.groupEnd";
 
 let storageKey = "debug";
