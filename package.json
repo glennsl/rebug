@@ -7,9 +7,17 @@
     "start": "bsb -make-world -w",
     "webpack": "webpack -w"
   },
+  "homepage": "https://github.com/glennsl/rebug#readme",
+  "bugs": "https://github.com/glennsl/rebug/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glennsl/rebug.git"
+  },
   "keywords": [
-    "BuckleScript",
-    "debug"
+    "reason",
+    "bucklescript",
+    "debug",
+    "logging"
   ],
   "author": "glennsl",
   "license": "MIT",
