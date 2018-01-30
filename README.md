@@ -3,6 +3,11 @@
 
 Originally a port of [debug](https://github.com/visionmedia/debug) to BuckleScript, but has since expanded a bit.
 
+[![npm](https://img.shields.io/npm/v/@glennsl/rebug.svg)](https://npmjs.org/@glennsl/rebug)
+[![Issues](https://img.shields.io/github/issues/glennsl/rebug.svg)](https://github.com/glennsl/rebug/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/glennsl/rebug.svg)](https://github.com/glennsl/rebug/commits/master)
+[![Size](https://img.shields.io/github/size/glennsl/rebug/lib/js/src/Debug.js.svg)]()
+
 _**NOTE:** NPM package has moved to `@glennsl/rebug`. Remember to update both `package.json` AND `bsconfig.json`._
 
 ## Status
