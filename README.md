@@ -3,6 +3,8 @@
 
 Originally a port of [debug](https://github.com/visionmedia/debug) to BuckleScript, but has since expanded a bit.
 
+_**NOTE:** NPM package has moved to `@glennsl/rebug`. Remember to update both `package.json` AND `bsconfig.json`._
+
 ## Status
 
 * Browser back-end has been implemented, Node.js back-end has not

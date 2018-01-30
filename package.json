@@ -1,5 +1,5 @@
 {
-  "name": "bs-rebug",
+  "name": "@glennsl/rebug",
   "version": "0.2.1",
   "description": "Reason/BuckleScript port of debug, with some extras",
   "scripts": {
