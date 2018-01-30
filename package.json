@@ -1,6 +1,7 @@
 {
   "name": "bs-rebug",
   "version": "0.2.1",
+  "description": "Reason/BuckleScript port of debug, with some extras",
   "scripts": {
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
@@ -21,6 +22,10 @@
   ],
   "author": "glennsl",
   "license": "MIT",
+  "files": [
+    "src/",
+    "bsconfig.json"
+  ],
   "devDependencies": {
     "bs-platform": "^2.0.0"
   },
