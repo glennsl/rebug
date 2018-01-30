@@ -27,9 +27,9 @@
     "bsconfig.json"
   ],
   "devDependencies": {
-    "bs-platform": "^2.0.0"
+    "bs-platform": "^2.1.0"
   },
   "dependencies": {
-    "webpack": "^3.8.1"
+    "webpack": "^3.10.0"
   }
 }
