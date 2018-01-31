@@ -44,13 +44,13 @@ See [examples](https://github.com/glennsl/rebug/blob/master/examples/) for more.
 ## Installation
 
 ```sh
-npm install --save bs-rebug
+npm install --save @glennsl/rebug
 ```
 
-Then add `bs-rebug` to `bs-dependencies` in your `bsconfig.json`:
+Then add `@glennsl/rebug` to `bs-dependencies` in your `bsconfig.json`:
 ```js
 {
   ...
-  "bs-dependencies": ["bs-rebug"]
+  "bs-dependencies": ["@glennsl/rebug"]
 }
 ```
