@@ -1,6 +1,6 @@
 {
   "name": "@glennsl/rebug",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Reason/BuckleScript port of debug, with some extras",
   "scripts": {
     "clean": "bsb -clean-world",
